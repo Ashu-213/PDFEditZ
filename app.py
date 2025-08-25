@@ -31,6 +31,7 @@ def compress_pdf_render_optimized(input_path, output_path, quality='medium'):
         
         # ULTRA-FAST compression settings optimized for Render free tier
         render_configs = {
+            'minimal': {'scale': 0.95, 'remove_images': False},   # Minimal compression
             'high': {'scale': 0.92, 'remove_images': False},     # Light compression, fastest
             'medium': {'scale': 0.78, 'remove_images': False},   # Balanced compression, fast
             'low': {'scale': 0.62, 'remove_images': True},      # Good compression, moderate
@@ -140,7 +141,7 @@ def terms():
     return render_template('terms.html')
 
 @app.route('/merge', methods=['POST'])
-def merge_pdfs():
+def merge_pdfs_route():
     if 'files' not in request.files:
         return jsonify({'success': False, 'error': 'No files provided'})
     
@@ -191,7 +192,7 @@ def compress_pdf_route():
         return jsonify({'success': False, 'error': 'No file provided'})
     
     file = request.files['file']
-    quality = request.form.get('quality', 'medium')
+    quality = request.form.get('compression_level', 'medium')  # Fixed: use compression_level from form
     
     if file.filename == '' or not allowed_file(file.filename):
         return jsonify({'success': False, 'error': 'Please select a valid PDF file'})
