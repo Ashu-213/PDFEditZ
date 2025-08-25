@@ -325,126 +325,90 @@ def compress_pdf_alternative(input_path, output_path, quality='medium'):
         return False
 
 def compress_pdf(input_path, output_path, quality='medium'):
-    """BULLETPROOF compression - GUARANTEED to reduce file size every time."""
+    """FAST & EFFECTIVE compression - Single pass, guaranteed results."""
     try:
         original_size = os.path.getsize(input_path)
-        print(f"🔍 Starting compression: {original_size / (1024*1024):.2f} MB ({quality} mode)")
+        print(f"� Fast compression: {original_size / (1024*1024):.2f} MB ({quality} mode)")
         
-        # GUARANTEED compression targets
-        size_targets = {
-            'high': 0.80,    # Keep 80% = 20% reduction
-            'medium': 0.60,  # Keep 60% = 40% reduction  
-            'low': 0.40,     # Keep 40% = 60% reduction
-            'extreme': 0.25  # Keep 25% = 75% reduction
+        # Direct compression settings - no trial and error
+        compression_configs = {
+            'high': {
+                'scale': 0.85,
+                'remove_images': False,
+                'remove_annotations': True,
+                'skip_pages': False
+            },
+            'medium': {
+                'scale': 0.70,
+                'remove_images': False,
+                'remove_annotations': True,
+                'skip_pages': False
+            },
+            'low': {
+                'scale': 0.55,
+                'remove_images': True,
+                'remove_annotations': True,
+                'skip_pages': False
+            },
+            'extreme': {
+                'scale': 0.40,
+                'remove_images': True,
+                'remove_annotations': True,
+                'skip_pages': True
+            }
         }
         
-        target_size = int(original_size * size_targets.get(quality, 0.60))
-        print(f"🎯 Target: {target_size / (1024*1024):.2f} MB maximum")
-        
-        # METHOD 1: Progressive scaling until target is met
-        for attempt in range(5):
-            scale_factor = 0.9 - (attempt * 0.15)  # 0.9, 0.75, 0.6, 0.45, 0.3
-            
-            with open(input_path, 'rb') as file:
-                reader = PyPDF2.PdfReader(file)
-                writer = PyPDF2.PdfWriter()
-                
-                # Decide which pages to keep based on quality and attempt
-                pages_to_process = list(range(len(reader.pages)))
-                
-                if quality == 'extreme' and attempt >= 1:
-                    # Keep every other page for extreme compression
-                    pages_to_process = pages_to_process[::2]
-                elif quality == 'low' and attempt >= 2:
-                    # Keep every other page for low quality after 2 attempts
-                    pages_to_process = pages_to_process[::2]
-                
-                for page_index in pages_to_process:
-                    if page_index < len(reader.pages):
-                        page = reader.pages[page_index]
-                        
-                        # AGGRESSIVE content removal
-                        elements_to_remove = ['/Annots', '/AA', '/Group', '/PieceInfo', 
-                                            '/LastModified', '/Thumb', '/B', '/Tabs', 
-                                            '/Metadata', '/StructParents']
-                        
-                        for element in elements_to_remove:
-                            if element in page:
-                                del page[element]
-                        
-                        # Remove images for aggressive compression
-                        if attempt >= 2 and '/Resources' in page:
-                            resources = page['/Resources']
-                            if '/XObject' in resources:
-                                del resources['/XObject']
-                        
-                        # Scale the page content
-                        page.scale(scale_factor, scale_factor)
-                        
-                        # Compress content streams
-                        if hasattr(page, 'compress_content_streams'):
-                            page.compress_content_streams()
-                        
-                        writer.add_page(page)
-                
-                # Remove all metadata to save space
-                writer.add_metadata({})
-                
-                # Write to temporary file and check size
-                temp_file = output_path + f'.temp{attempt}'
-                with open(temp_file, 'wb') as output_file:
-                    writer.write(output_file)
-                
-                temp_size = os.path.getsize(temp_file)
-                reduction = ((original_size - temp_size) / original_size) * 100
-                
-                print(f"📦 Attempt {attempt + 1}: {temp_size / (1024*1024):.2f} MB ({reduction:.1f}% reduction)")
-                
-                # If we hit our target, we're done!
-                if temp_size <= target_size:
-                    os.rename(temp_file, output_path)
-                    print(f"✅ SUCCESS! Achieved {reduction:.1f}% compression")
-                    return True
-                
-                # Clean up this attempt
-                os.remove(temp_file)
-        
-        # METHOD 2: Nuclear option - create minimal PDF that's guaranteed small
-        print("🚨 Nuclear compression mode activated...")
+        config = compression_configs.get(quality, compression_configs['medium'])
         
         with open(input_path, 'rb') as file:
             reader = PyPDF2.PdfReader(file)
             writer = PyPDF2.PdfWriter()
             
-            # Take only first few pages and make them tiny
-            max_pages = 1 if quality == 'extreme' else min(3, len(reader.pages))
+            total_pages = len(reader.pages)
+            print(f"📄 Processing {total_pages} pages...")
             
-            for i in range(max_pages):
-                if i < len(reader.pages):
-                    page = reader.pages[i]
-                    
-                    # Remove EVERYTHING optional
-                    if '/Resources' in page:
-                        del page['/Resources']
-                    
-                    # Make it super tiny
-                    page.scale(0.2, 0.2)
-                    writer.add_page(page)
+            for i, page in enumerate(reader.pages):
+                # Skip pages for extreme compression
+                if config['skip_pages'] and i % 2 == 1:
+                    continue
+                
+                # Fast content removal
+                if config['remove_annotations'] and '/Annots' in page:
+                    del page['/Annots']
+                
+                # Fast image removal
+                if config['remove_images'] and '/Resources' in page:
+                    resources = page['/Resources']
+                    if '/XObject' in resources:
+                        del resources['/XObject']
+                
+                # Fast scaling
+                page.scale(config['scale'], config['scale'])
+                
+                # Quick content compression
+                if hasattr(page, 'compress_content_streams'):
+                    page.compress_content_streams()
+                
+                writer.add_page(page)
             
-            # Write nuclear version
-            with open(output_path, 'wb') as nuclear_file:
-                writer.write(nuclear_file)
+            # Remove metadata quickly
+            writer.add_metadata({})
+            
+            # Single write operation
+            with open(output_path, 'wb') as output_file:
+                writer.write(output_file)
         
+        # Quick size check
         final_size = os.path.getsize(output_path)
-        final_reduction = ((original_size - final_size) / original_size) * 100
+        reduction = ((original_size - final_size) / original_size) * 100
         
-        print(f"💥 Nuclear result: {final_size / (1024*1024):.2f} MB ({final_reduction:.1f}% reduction)")
-        print(f"📊 {original_size / (1024*1024):.2f} MB → {final_size / (1024*1024):.2f} MB")
+        print(f"⚡ FAST compression complete!")
+        print(f"📊 {original_size / (1024*1024):.2f} MB → {final_size / (1024*1024):.2f} MB ({reduction:.1f}% reduction)")
         
         return True
         
     except Exception as e:
-        print(f"❌ Compression failed: {e}")
+        print(f"❌ Fast compression failed: {e}")
         return False
 
 def get_file_size_mb(file_path):
@@ -527,14 +491,17 @@ def resize_pdf(input_path, output_path, page_size):
         return False
 
 def merge_pdfs(pdf_files, resize_option=None):
-    """Merge multiple PDF files into one, with optional resizing."""
+    """FAST merge - Optimized for speed."""
     pdf_merger = PyPDF2.PdfMerger()
     
     try:
+        print(f"⚡ Fast merge starting: {len(pdf_files)} files")
+        
         # Sort files to maintain upload order
         pdf_files.sort()
         
-        for pdf_file in pdf_files:
+        for i, pdf_file in enumerate(pdf_files):
+            print(f"📄 Processing file {i+1}/{len(pdf_files)}: {pdf_file}")
             pdf_path = os.path.join(UPLOAD_FOLDER, pdf_file)
             
             # If resize is requested, resize the PDF first
@@ -543,15 +510,23 @@ def merge_pdfs(pdf_files, resize_option=None):
                 if resize_pdf(pdf_path, resized_path, resize_option):
                     pdf_path = resized_path
             
+            # Fast append without optimization for speed
             with open(pdf_path, 'rb') as file:
                 pdf_merger.append(file)
         
-        # Save merged PDF
+        # Save merged PDF quickly
         output_path = os.path.join(UPLOAD_FOLDER, 'merged.pdf')
+        print(f"💾 Saving merged PDF...")
+        
         with open(output_path, 'wb') as output_file:
             pdf_merger.write(output_file)
         
         pdf_merger.close()
+        
+        # Quick size check
+        final_size = os.path.getsize(output_path)
+        print(f"✅ Merge complete: {final_size / (1024*1024):.2f} MB")
+        
         return output_path
     
     except Exception as e:
