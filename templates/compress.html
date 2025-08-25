@@ -377,7 +377,7 @@
         {% endwith %}
         
         <!-- Upload form -->
-        <form action="/compress-pdf" method="post" enctype="multipart/form-data" class="upload-form">
+        <form action="/compress_file" method="post" enctype="multipart/form-data" class="upload-form">
             <div class="file-input-wrapper">
                 <input type="file" 
                        id="file" 
@@ -510,7 +510,7 @@
         function updateSubmitButton() {
             const selectedLevel = document.querySelector('input[name="compression_level"]:checked').value;
             const levelNames = {
-                'extreme': 'Maximum',
+                'minimal': 'Maximum',
                 'low': 'High', 
                 'medium': 'Balanced',
                 'high': 'Light'
@@ -524,46 +524,6 @@
         
         // Initialize button text
         updateSubmitButton();
-        
-        // SPEED OPTIMIZATION: Add loading indicator
-        document.querySelector('form').addEventListener('submit', function(e) {
-            const submitBtn = document.getElementById('submitBtn');
-            const selectedLevel = document.querySelector('input[name="compression_level"]:checked').value;
-            
-            // Show loading state
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `
-                <span style="display: inline-block; animation: spin 1s linear infinite;">⚡</span>
-                Fast compressing...
-            `;
-            
-            // Add spinning animation
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes spin {
-                    from { transform: rotate(0deg); }
-                    to { transform: rotate(360deg); }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            // Estimate time based on quality
-            const estimatedTimes = {
-                'high': '5-10 seconds',
-                'medium': '3-8 seconds',
-                'low': '2-6 seconds', 
-                'extreme': '1-4 seconds'
-            };
-            
-            setTimeout(() => {
-                if (submitBtn.disabled) {
-                    submitBtn.innerHTML = `
-                        <span style="display: inline-block; animation: spin 1s linear infinite;">⚡</span>
-                        Processing... (Est: ${estimatedTimes[selectedLevel]})
-                    `;
-                }
-            }, 1000);
-        });
     </script>
 </body>
 </html>
