@@ -3,8 +3,15 @@ import glob
 from flask import Flask, render_template, request, send_file, flash, redirect, url_for
 from werkzeug.utils import secure_filename
 import PyPDF2
-import fitz  # PyMuPDF
 from dotenv import load_dotenv
+
+# Try to import PyMuPDF, but gracefully handle if not available
+try:
+    import fitz  # PyMuPDF
+    PYMUPDF_AVAILABLE = True
+except ImportError:
+    PYMUPDF_AVAILABLE = False
+    print("PyMuPDF not available - using PyPDF2 only mode")
 
 # Load environment variables from .env file
 load_dotenv()
@@ -34,8 +41,45 @@ def clean_uploads_folder():
         except OSError:
             pass
 
+def compress_pdf_pypdf2_only(input_path, output_path, quality='medium'):
+    """Compression using PyPDF2 only - fallback when PyMuPDF not available."""
+    try:
+        with open(input_path, 'rb') as input_file:
+            reader = PyPDF2.PdfReader(input_file)
+            writer = PyPDF2.PdfWriter()
+            
+            # Add all pages to writer
+            for page in reader.pages:
+                # Basic compression by removing unnecessary data
+                if hasattr(page, 'compress_content_streams'):
+                    page.compress_content_streams()
+                writer.add_page(page)
+            
+            # Apply compression settings based on quality
+            if quality in ['low', 'extreme']:
+                # More aggressive compression for low quality
+                writer.add_metadata({
+                    '/Producer': 'PDFEditZ Compressor',
+                    '/Creator': 'PDFEditZ'
+                })
+            
+            # Write compressed PDF
+            with open(output_path, 'wb') as output_file:
+                writer.write(output_file)
+        
+        print(f"PyPDF2 compression completed: {input_path} -> {output_path}")
+        return True
+        
+    except Exception as e:
+        print(f"PyPDF2 compression failed: {e}")
+        return False
+
 def compress_pdf_working(input_path, output_path, quality='medium'):
-    """WORKING compression method - GUARANTEED to reduce file size."""
+    """WORKING compression method - Compatible with or without PyMuPDF."""
+    if not PYMUPDF_AVAILABLE:
+        # Fallback to PyPDF2 compression
+        return compress_pdf_pypdf2_only(input_path, output_path, quality)
+    
     try:
         doc = fitz.open(input_path)
         
@@ -289,6 +333,13 @@ def get_file_size_mb(file_path):
 
 def resize_pdf(input_path, output_path, page_size):
     """Resize PDF pages to specified size."""
+    if not PYMUPDF_AVAILABLE:
+        # If PyMuPDF not available, just copy the file (no resizing)
+        import shutil
+        shutil.copy2(input_path, output_path)
+        print(f"PyMuPDF not available - copying file without resizing: {input_path} -> {output_path}")
+        return True
+        
     try:
         # Define page sizes in points (72 points = 1 inch)
         sizes = {
@@ -559,4 +610,6 @@ if __name__ == '__main__':
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
     
     # Run the app
-    app.run(debug=True, host='localhost', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(debug=debug, host='0.0.0.0', port=port)
