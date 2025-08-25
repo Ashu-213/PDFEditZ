@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDFEditZ - PDF Merger & Compressor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .logo .pdf {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+        
+        .logo .editz {
+            color: #4ecdc4;
+            font-weight: 300;
+        }
+        
+        .tagline {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+            margin-bottom: 5px;
+        }
+        
+        .author {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            font-style: italic;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .nav-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e9ecef;
+            background-color: #f8f9fa;
+            border-radius: 10px 10px 0 0;
+            overflow: hidden;
+        }
+        
+        .nav-tab {
+            padding: 15px 25px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            color: #495057;
+            margin: 0;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .nav-tab:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+        
+        .nav-tab.active {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,123,255,0.3);
+        }
+        
+        .page-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            font-weight: 300;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .upload-form {
+            margin-bottom: 20px;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .file-input {
+            opacity: 0;
+            position: absolute;
+            z-index: -1;
+        }
+        
+        .file-input-button {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            text-align: center;
+            transition: background-color 0.3s;
+        }
+        
+        .file-input-button:hover {
+            background-color: #0056b3;
+        }
+        
+        .file-list {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            min-height: 40px;
+        }
+        
+        .file-item {
+            display: inline-block;
+            background-color: #e9ecef;
+            padding: 5px 10px;
+            margin: 2px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        
+        .resize-options {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        
+        .resize-options h4 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .size-option {
+            display: flex;
+            align-items: center;
+        }
+        
+        .size-option input[type="radio"] {
+            margin-right: 8px;
+        }
+        
+        .size-option label {
+            font-size: 13px;
+            cursor: pointer;
+            color: #555;
+        }
+        
+        .submit-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        .submit-btn:hover {
+            background-color: #218838;
+        }
+        
+        .submit-btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        
+        .flash-message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .flash-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .instructions {
+            background-color: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: #0066cc;
+        }
+        
+        .instructions ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 8px 0;
+        }
+        
+        .footer {
+            margin-top: 40px;
+            padding: 30px 0;
+            text-align: center;
+            border-top: 1px solid #dee2e6;
+            color: #6c757d;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .footer-section h4 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .footer-section p, .footer-section a {
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #6c757d;
+            text-decoration: none;
+        }
+        
+        .footer-section a:hover {
+            color: #007bff;
+        }
+        
+        .copyright {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+            font-size: 0.8rem;
+            color: #868e96;
+        }
+        
+        .made-by {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .version {
+            display: inline-block;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <div class="header">
+        <div class="logo">
+            <span class="pdf">PDF</span><span class="editz">EditZ</span>
+        </div>
+        <div class="tagline">Professional PDF Tools Suite</div>
+        <div class="author">Developed by Ashu</div>
+    </div>
+
+    <div class="container">
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <a href="/" class="nav-tab active">📄 PDF Merger</a>
+            <a href="/compress" class="nav-tab">📦 PDF Compressor</a>
+        </div>
+        
+        <h1 class="page-title">PDF Merger</h1>
+        
+        <div class="instructions">
+            <h3>How to use:</h3>
+            <ul>
+                <li>Select multiple PDF files (minimum 2 files)</li>
+                <li>Choose a page size if you want to resize all pages (optional)</li>
+                <li>Files will be merged in the order you select them</li>
+                <li>Click "Merge PDFs" to download the combined file</li>
+                <li>Maximum file size: 16MB per file</li>
+            </ul>
+        </div>
+        
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-message flash-error">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Upload form -->
+        <form action="/merge" method="post" enctype="multipart/form-data" class="upload-form">
+            <div class="file-input-wrapper">
+                <input type="file" 
+                       id="files" 
+                       name="files" 
+                       class="file-input" 
+                       multiple 
+                       accept=".pdf"
+                       required>
+                <label for="files" class="file-input-button">
+                    Choose PDF Files
+                </label>
+            </div>
+            
+            <div class="file-list" id="fileList">
+                <em>No files selected</em>
+            </div>
+            
+            <!-- Resize Options -->
+            <div class="resize-options">
+                <h4>📏 Page Size Options (Optional)</h4>
+                <div class="size-grid">
+                    <div class="size-option">
+                        <input type="radio" id="none" name="resize_option" value="none" checked>
+                        <label for="none">Keep Original</label>
+                    </div>
+                    <div class="size-option">
+                        <input type="radio" id="a4" name="resize_option" value="A4">
+                        <label for="a4">A4 (210×297mm)</label>
+                    </div>
+                    <div class="size-option">
+                        <input type="radio" id="a3" name="resize_option" value="A3">
+                        <label for="a3">A3 (297×420mm)</label>
+                    </div>
+                    <div class="size-option">
+                        <input type="radio" id="a5" name="resize_option" value="A5">
+                        <label for="a5">A5 (148×210mm)</label>
+                    </div>
+                    <div class="size-option">
+                        <input type="radio" id="letter" name="resize_option" value="Letter">
+                        <label for="letter">Letter (8.5×11")</label>
+                    </div>
+                    <div class="size-option">
+                        <input type="radio" id="legal" name="resize_option" value="Legal">
+                        <label for="legal">Legal (8.5×14")</label>
+                    </div>
+                    <div class="size-option">
+                        <input type="radio" id="tabloid" name="resize_option" value="Tabloid">
+                        <label for="tabloid">Tabloid (11×17")</label>
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                Merge PDFs
+            </button>
+        </form>
+        
+        <!-- Footer Section -->
+        <div class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>About PDFEditZ</h4>
+                    <p>A powerful, secure, and user-friendly PDF processing tool designed to handle all your PDF needs. Built with modern web technologies for optimal performance.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Privacy & Security</h4>
+                    <p>• Files are processed locally and automatically deleted<br>
+                    • No data is stored on our servers<br>
+                    • SSL encrypted connections<br>
+                    • GDPR compliant processing</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Support</h4>
+                    <p>• Maximum file size: 16MB per file<br>
+                    • Supported format: PDF only<br>
+                    • Processing time: Usually under 30 seconds<br>
+                    • <a href="#contact">Contact Support</a></p>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <div class="made-by">
+                    © 2025 PDFEditZ - Created by Ashu
+                    <span class="version">v2.1.0</span>
+                </div>
+                <p style="margin-top: 10px;">
+                    All rights reserved. This software is licensed under MIT License. 
+                    <br>By using PDFEditZ, you agree to our Terms of Service and Privacy Policy.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('files').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const fileList = document.getElementById('fileList');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (files.length === 0) {
+                fileList.innerHTML = '<em>No files selected</em>';
+                submitBtn.disabled = true;
+                return;
+            }
+            
+            // Display selected files
+            let html = '';
+            for (let i = 0; i < files.length; i++) {
+                if (files[i].type === 'application/pdf') {
+                    html += `<span class="file-item">${files[i].name}</span>`;
+                }
+            }
+            
+            if (html === '') {
+                fileList.innerHTML = '<em>No valid PDF files selected</em>';
+                submitBtn.disabled = true;
+            } else {
+                fileList.innerHTML = html;
+                const pdfCount = fileList.querySelectorAll('.file-item').length;
+                submitBtn.disabled = pdfCount < 2;
+                
+                if (pdfCount < 2) {
+                    fileList.innerHTML += '<br><em>Please select at least 2 PDF files</em>';
+                }
+            }
+        });
+        
+        // Update submit button text based on resize option
+        const resizeOptions = document.querySelectorAll('input[name="resize_option"]');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        function updateSubmitButton() {
+            const selectedResize = document.querySelector('input[name="resize_option"]:checked').value;
+            if (selectedResize === 'none') {
+                submitBtn.textContent = 'Merge PDFs';
+            } else {
+                submitBtn.textContent = `Resize to ${selectedResize} & Merge PDFs`;
+            }
+        }
+        
+        resizeOptions.forEach(option => {
+            option.addEventListener('change', updateSubmitButton);
+        });
+        
+        // Initialize button text
+        updateSubmitButton();
+    </script>
+</body>
+</html>
