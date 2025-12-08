@@ -1,277 +1,136 @@
-# 🎯 PDFEditZ - Professional PDF Management Tool
+# Word to PDF Converter
 
-[![Flask](https://img.shields.io/badge/Flask-2.3.3-blue.svg)](https://flask.palletsprojects.com/)
-[![Python](https://img.shields.io/badge/Python-3.10+-green.svg)](https://www.python.org/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen.svg)]()
+A lightweight Flask web application to convert Word documents (.docx) to PDF format instantly.
 
-**PDFEditZ** is a modern, professional web application for comprehensive PDF management. Built with Flask and featuring a sleek gradient design, it provides powerful tools for merging and compressing PDF documents with ease.
+## Features
 
-## ✨ Features
+- 📄 Upload Word documents (.docx only)
+- ⚡ Fast conversion to PDF
+- 🎨 Clean, minimal Bootstrap UI
+- 🖱️ Drag and drop support
+- 🔄 2-step process (Convert → Download)
+- 🧹 Automatic cleanup (no files stored)
+- 🔐 Secure with environment variables
+- 📦 Modular architecture
 
-### 📄 **PDF Merger**
-- Upload multiple PDF files simultaneously
-- Merge PDFs in upload order with drag-and-drop reordering
-- Preserve document quality and formatting
-- Support for various page sizes and orientations
-
-### 🗜️ **PDF Compression** 
-- **4 Compression Levels**: High, Medium, Low, and Extreme
-- Guaranteed file size reduction using advanced algorithms
-- Individual file processing for upload limit compliance
-- Smart compression with fallback methods
-
-### 📐 **Page Resizing**
-- Standardize PDF pages to common formats:
-  - **A-Series**: A3, A4, A5
-  - **US Letter Sizes**: Letter, Legal, Tabloid
-- Maintain aspect ratio during resizing
-- Batch processing support
-
-### 🎨 **Professional Interface**
-- Modern gradient design with PDFEditZ branding
-- Responsive layout for desktop and mobile
-- Tabbed navigation between features
-- Real-time file size display
-- Progress indicators and status updates
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Python 3.6 or higher
-- 50MB free disk space
-- Modern web browser
-
-### Installation
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/pdfeditz.git
-   cd pdfeditz
-   ```
-
-2. **Create virtual environment:**
-   ```bash
-   python -m venv .venv
-   
-   # Windows
-   .venv\Scripts\activate
-   
-   # macOS/Linux
-   source .venv/bin/activate
-   ```
-
-3. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Set up environment variables:**
-   ```bash
-   # Copy the example environment file
-   cp .env.example .env
-   
-   # Edit .env and set your own SECRET_KEY
-   # Generate a new key with: python -c "import secrets; print(secrets.token_hex(32))"
-   ```
-
-5. **Run the application:**
-   ```bash
-   python app.py
-   ```
-
-5. **Open your browser:**
-   ```
-   http://localhost:5000
-   ```
-
-## 📋 Dependencies
+## Project Structure
 
 ```
-Flask==2.3.3
-PyPDF2==3.0.1
-PyMuPDF==1.23.8
-Werkzeug==2.3.7
-```
-
-## 🔧 Configuration
-
-### Environment Variables
-- `FLASK_ENV`: Set to `development` for debug mode
-- `SECRET_KEY`: Change the secret key for production deployment
-- `MAX_CONTENT_LENGTH`: Adjust maximum file upload size (default: 16MB)
-
-### File Upload Limits
-- Maximum file size: 16MB per PDF
-- Supported formats: PDF only
-- Concurrent uploads: Up to 10 files
-
-## 📁 Project Structure
-
-```
-pdfeditz/
-├── app.py                 # Main Flask application
+PDFEditZ/
+├── app.py                 # Application entry point
+├── config.py              # Configuration settings
 ├── requirements.txt       # Python dependencies
-├── README.md             # Project documentation
-├── templates/            # HTML templates
-│   ├── index.html        # PDF merger interface
-│   ├── compress.html     # PDF compression interface
-│   └── terms.html        # Terms of service & privacy
-├── uploads/              # Temporary file storage
-└── .venv/               # Virtual environment (not in repo)
+├── routes/                # Route handlers (blueprints)
+│   ├── __init__.py
+│   └── main.py           # Main routes
+├── utils/                 # Utility functions
+│   ├── __init__.py
+│   ├── converter.py      # Conversion logic
+│   └── file_handler.py   # File operations
+├── static/                # Static files
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── main.js
+├── templates/             # HTML templates
+│   └── index.html
+└── uploads/               # Temporary file storage
 ```
 
-## 🛡️ Security Features
+## Installation
 
-- Secure filename handling with Werkzeug
-- File type validation (PDF only)
-- Automatic cleanup of temporary files
-- Size limits to prevent abuse
-- Input sanitization for all uploads
+1. Clone the repository:
+```bash
+git clone https://github.com/Ashu-213/PDFEditZ.git
+cd PDFEditZ
+```
 
-## 🔄 API Endpoints
+2. Create a virtual environment (optional but recommended):
+```bash
+python -m venv venv
+venv\Scripts\activate  # On Windows
+```
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | Main merger interface |
-| `/compress` | GET | Compression interface |
-| `/terms` | GET | Terms of service |
-| `/merge` | POST | Process PDF merger |
-| `/compress_file` | POST | Process PDF compression |
+3. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
 
-## 🎯 Use Cases
+4. Set up environment variables:
+```bash
+# Copy the example file
+copy .env.example .env
 
-- **Document Management**: Combine multiple reports into single PDFs
-- **File Size Optimization**: Reduce PDFs for email or upload limits
-- **Standardization**: Convert documents to uniform page sizes
-- **Archive Preparation**: Organize and compress document collections
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🏆 Credits
-
-**Created by Ashu** - 2025
-
-- Flask framework for web application
-- PyPDF2 for PDF manipulation
-- PyMuPDF for advanced PDF processing
-- Modern gradient design inspiration
-
-## 📞 Support
-
-For support, questions, or feature requests:
-- Email: support@pdfeditz.com
-- Create an issue on GitHub
-- Visit our website: [PDFEditZ.com](https://pdfeditz.com)
-
-## 🔮 Roadmap
-
-- [ ] Batch processing for multiple files
-- [ ] Cloud storage integration
-- [ ] Advanced PDF editing features
-- [ ] API for developers
-- [ ] Docker containerization
-
----
-
-**© 2025 PDFEditZ - Professional PDF Management Made Simple**
+# Edit .env and add your SECRET_KEY
+# Generate a secure key: python -c "import os; print(os.urandom(24).hex())"
+```
 
 ## Usage
 
-### 📄 PDF Merger (Multi-file):
-1. Open the web application in your browser
-2. Stay on the "PDF Merger" tab
-3. Click "Choose PDF Files" and select multiple PDF files (minimum 2)
-4. **🆕 Optionally select a target page size for resizing:**
-   - **Keep Original**: No resizing (default)
-   - **A4**: 210×297mm (most common)
-   - **A3**: 297×420mm (larger format)
-   - **A5**: 148×210mm (smaller format)
-   - **Letter**: 8.5×11 inches (US standard)
-   - **Legal**: 8.5×14 inches (US legal)
-   - **Tabloid**: 11×17 inches (large format)
-5. The files will be listed in the order you selected them
-6. Click "Merge PDFs" (or "Resize to [Size] & Merge PDFs") to process
-7. The merged PDF will be downloaded as `merged.pdf`
-
-### 📦 PDF Compressor (Single file):
-1. Click on the "PDF Compressor" tab
-2. Upload a single PDF file
-3. **Choose compression level based on your needs:**
-   - **Light Compression**: Minimal compression, high quality (95% image quality, 150 DPI)
-   - **Balanced Compression**: Good balance of size and quality (85% image quality, 120 DPI) - **Recommended**
-   - **High Compression**: Small file size, good quality (70% image quality, 96 DPI)
-   - **Maximum Compression**: Smallest file size, lower quality (50% image quality, 72 DPI)
-4. Click "Apply [Level] Compression" to process
-5. Download the compressed PDF with reduced file size
-6. **Perfect for meeting website upload limits!**
-
-## File Structure
-
-```
-pdfmerger/
-├── app.py              # Main Flask application
-├── templates/
-│   └── index.html      # Upload form template
-├── uploads/            # Temporary storage for uploaded files
-├── requirements.txt    # Python dependencies
-└── README.md          # This file
+1. Run the application:
+```bash
+python app.py
 ```
 
-## Technical Details
+2. Open your browser and go to `http://localhost:5000`
 
-- **Backend**: Flask (Python web framework)
-- **PDF Processing**: PyPDF2 library
-- **File Upload**: HTML5 multiple file input
-- **Security**: Secure filename handling with Werkzeug
-- **Storage**: Temporary files stored in `uploads/` folder
-- **Cleanup**: Automatic cleanup of uploaded files after each merge
+3. Upload a .docx file, convert, and download
+
+**Note**: Old .doc format is not supported. Save your file as .docx in Word first.
 
 ## Configuration
 
-You can modify the following settings in `app.py`:
+Edit `.env` file to customize:
+- `SECRET_KEY`: Flask secret key (generate using: `python -c "import os; print(os.urandom(24).hex())"`)
+- `MAX_CONTENT_LENGTH`: Maximum file size in bytes (default: 16MB)
+- `UPLOAD_FOLDER`: Folder for temporary file storage
+- `ALLOWED_EXTENSIONS`: Supported file extensions (default: docx)
 
-- `MAX_CONTENT_LENGTH`: Maximum file size (default: 16MB)
-- `UPLOAD_FOLDER`: Temporary storage folder (default: 'uploads')
-- `app.secret_key`: Change this for production use
+**Important**: Never commit your `.env` file to version control. Use `.env.example` as a template.
 
-## Limitations
+## Requirements
 
-- Maximum file size: 16MB per PDF
-- Minimum 2 PDF files required for merging
-- Files are merged in upload order
-- Temporary files are cleaned after each operation
+- Python 3.7+
+- Flask 3.0+
+- docx2pdf
+- Microsoft Word (required for docx2pdf on Windows)
 
-## Production Notes
+## How It Works
 
-For production deployment:
+1. User uploads a .docx file
+2. File is temporarily saved with unique timestamp
+3. Conversion happens using Microsoft Word automation
+4. PDF is loaded into memory
+5. Temporary files are immediately deleted
+6. User downloads PDF from memory
 
-1. Change the secret key in `app.py`
-2. Set `debug=False` in the app.run() call
-3. Use a proper WSGI server like Gunicorn
-4. Configure proper error handling and logging
-5. Add authentication if needed
-6. Consider using cloud storage for file handling
+No files are permanently stored on the server!
 
-## Error Handling
+## Adding New Features
 
-The app handles common errors:
-- Invalid file types (only PDF allowed)
-- File size too large
-- Insufficient number of files
-- PDF processing errors
-- File system errors
+The modular structure makes it easy to extend:
+
+- **New routes**: Add blueprints to `routes/` folder
+- **New converters**: Extend `DocumentConverter` class in `utils/`
+- **New file types**: Update `ALLOWED_EXTENSIONS` and converter logic
+- **New UI**: Modify templates in `templates/` and styles in `static/`
 
 ## License
 
-This project is open source and available under the MIT License.
+MIT License - feel free to use for any project!
+
+1. User uploads a .docx file
+2. File is temporarily saved with unique timestamp
+3. Conversion happens using Microsoft Word automation
+4. PDF is loaded into memory
+5. Temporary files are immediately deleted
+6. User downloads PDF from memory
+
+No files are permanently stored on the server!.7+
+- Flask
+- docx2pdf
+- Microsoft Word (required for docx2pdf on Windows)
+
+## Note
+
+The `docx2pdf` library requires Microsoft Word to be installed on Windows systems.
