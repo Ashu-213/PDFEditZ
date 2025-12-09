@@ -92,8 +92,22 @@ Edit `.env` file to customize:
 
 - Python 3.7+
 - Flask 3.0+
-- docx2pdf
-- Microsoft Word (required for docx2pdf on Windows)
+- LibreOffice (for PDF conversion)
+  - Windows: Uses Microsoft Word if available, falls back to LibreOffice
+  - Linux/Mac: Uses LibreOffice
+
+## Deployment
+
+This app is designed to work on Linux servers (Render, Railway, Heroku, etc.).
+
+**For Render:**
+1. Add build script: `render-build.sh`
+2. Set environment variables in Render dashboard
+3. LibreOffice will be installed automatically
+
+**Required Environment Variables:**
+- `SECRET_KEY`: Your secure secret key
+- `PORT`: Auto-set by hosting platform
 
 ## How It Works
 
