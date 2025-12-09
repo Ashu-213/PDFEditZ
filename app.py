@@ -19,15 +19,7 @@ def create_app(config_name='development'):
     
     return app
 
-# Create app instance for Gunicorn
-app = create_app(os.environ.get('FLASK_ENV', 'production'))
-
 if __name__ == '__main__':
-    # Use production config if FLASK_ENV is not set
-    config_name = os.environ.get('FLASK_ENV', 'production')
-    app = create_app(config_name)
+    app = create_app('development')
     port = int(os.environ.get('PORT', 5000))
-    
-    # Debug only in development
-    debug = config_name == 'development'
-    app.run(host='0.0.0.0', port=port, debug=debug)
+    app.run(host='0.0.0.0', port=port, debug=True)

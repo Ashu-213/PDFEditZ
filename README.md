@@ -92,29 +92,8 @@ Edit `.env` file to customize:
 
 - Python 3.7+
 - Flask 3.0+
-- LibreOffice (for PDF conversion)
-  - Windows: Uses Microsoft Word if available, falls back to LibreOffice
-  - Linux/Mac: Uses LibreOffice
-
-## Deployment
-
-This app is designed to work on Linux servers (Render, Railway, Heroku, etc.).
-
-**For Render:**
-1. Connect your GitHub repository
-2. Set **Build Command**: `./render-build.sh`
-3. Set **Start Command**: `gunicorn app:app`
-4. Add environment variables:
-   - `SECRET_KEY`: Generate with `python -c "import os; print(os.urandom(24).hex())"`
-   - `FLASK_ENV`: Set to `production`
-5. Deploy!
-
-**Note:** LibreOffice will be installed automatically during build.
-
-**Required Environment Variables:**
-- `SECRET_KEY`: Your secure secret key
-- `FLASK_ENV`: `production` for deployment, `development` for local
-- `PORT`: Auto-set by hosting platform
+- docx2pdf
+- Microsoft Word (required for docx2pdf on Windows)
 
 ## How It Works
 
